@@ -1,0 +1,42 @@
+name: create JSign docker release
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get latest jsign version
+        id: get_version
+        run: |
+          version=$(curl -s https://api.github.com/repos/ebourg/jsign/releases/latest | grep "tag_name" | cut -d '"' -f 4)
+          echo "Latest version: $version"
+          echo "JSIGN_VERSION=${version#v}" >> $GITHUB_ENV
+          echo "version_tag=${version#v}" >> $GITHUB_OUTPUT
+      
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:${{ steps.get_version.outputs.version_tag }}
+          build-args: |
+            JSIGN_VERSION=${{ env.JSIGN_VERSION }}

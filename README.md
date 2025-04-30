@@ -1,56 +1,47 @@
-# jsign-docker
+# JSign Docker
 
-This repository builds the latest [jsign](https://github.com/ebourg/jsign) release and packages it into a self-contained Docker image using `jpackage`. The resulting image exposes the `jsign` binary, making it easy to use `jsign` without installing Java or any dependencies.
+> A convenient Docker image for code signing with JSign
 
-## 🐳 Docker Image
+## Overview
 
-The Docker image is published to **GitHub Container Registry (GHCR)**:
+This repository builds and publishes Docker images that package [JSign](https://github.com/ebourg/jsign) - a powerful Java-based code signing tool. The image is built using `jpackage` to provide a streamlined command-line experience for all your code signing needs.
 
-```
-ghcr.io/FourCoreLabs/jsign-docker:latest
-```
+## Features
 
-It is also version-tagged automatically based on the latest jsign release, for example:
+- **Always Updated**: Automatically tracks the latest JSign releases
+- **Simple Interface**: Exposes the JSign binary for straightforward command-line usage
+- **Cross-Platform**: Run consistently across any environment that supports Docker
+- **Minimal Size**: Optimized image with only the necessary dependencies
 
-```
-ghcr.io/FourCoreLabs/jsign-docker:7.1
-```
-
-## 🚀 Usage
-
-You can use the container just like the `jsign` CLI:
+## Usage
 
 ```bash
-docker run --rm ghcr.io/FourCoreLabs/jsign-docker --help
+# Pull the latest image
+docker pull ghcr.io/FourCoreLabs/jsign-docker:latest
+
+# Run JSign with your parameters
+docker run --rm -v $(pwd):/work ghcr.io/FourCoreLabs/jsign-docker jsign [options]
 ```
 
-To sign a JAR file:
+### Example: Signing a Windows executable
 
 ```bash
 docker run --rm \
-  -v $(pwd):/data \
+  -v $(pwd):/work \
   ghcr.io/FourCoreLabs/jsign-docker \
-  /data/your-app.jar --alias YOUR_ALIAS ...
+  jsign --keystore mycert.pfx \
+        --storepass mypassword \
+        --storetype PKCS12 \
+        --tsaurl http://timestamp.digicert.com \
+        myapplication.exe
 ```
 
-## 🛠️ How It Works
+## Versioning
 
-- Downloads the latest `jsign` release from GitHub.
-- Uses `jpackage` to create a lightweight application image.
-- The built Docker image includes only what's needed to run `jsign`.
+Each image is tagged with both:
+- The specific JSign version (e.g., `7.1`)
+- The `latest` tag for the most recent build
 
-## 💪 Build It Yourself
+## License
 
-```bash
-docker build -t jsign-docker --build-arg JSIGN_VERSION=7.1 .
-```
-
-## 📦 GHCR Publishing
-
-A GitHub Actions workflow automatically:
-
-- Fetches the latest jsign version
-- Builds the Docker image
-- Publishes it to GHCR
-- Tags it with both `:latest` and the version number
-
+This Docker packaging is provided under MIT license. JSign itself is licensed under Apache License 2.0.

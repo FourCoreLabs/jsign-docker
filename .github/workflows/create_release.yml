@@ -32,5 +32,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository }}:latest, ghcr.io/${{ github.repository }}:${{ steps.version.outputs.version }}
+          tags: ghcr.io/fourcorelabs/jsign-docker:latest, ghcr.io/fourcorelabs/jsign-docker:${{ steps.version.outputs.version }}
           build-args: JSIGN_VERSION=${{ env.JSIGN_VERSION }}
